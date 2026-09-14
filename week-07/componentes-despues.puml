@@ -1,0 +1,70 @@
+@startuml
+title ASII-08 - Componentes DESPUES (Repository Pattern adoptado)
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+package "Presentation" {
+    component TransferController
+    component DischargeController
+}
+
+package "Application" {
+    component TransferPatientService
+    component DischargePatientService
+}
+
+package "Domain" {
+    component AdmissionDischargePolicy
+}
+
+package "Contracts (interfaces)" {
+    interface AdmissionRepositoryInterface
+    interface BedRepositoryInterface
+    interface BedTransferRepositoryInterface
+    interface TransactionManagerInterface
+}
+
+package "Infrastructure" {
+    component EloquentAdmissionRepository
+    component EloquentBedRepository
+    component EloquentBedTransferRepository
+    component LaravelTransactionManager
+}
+
+database PostgreSQL
+
+TransferController --> TransferPatientService
+DischargeController --> DischargePatientService
+
+TransferPatientService --> AdmissionRepositoryInterface
+TransferPatientService --> BedRepositoryInterface
+TransferPatientService --> BedTransferRepositoryInterface
+TransferPatientService --> TransactionManagerInterface
+
+DischargePatientService --> AdmissionRepositoryInterface
+DischargePatientService --> BedRepositoryInterface
+DischargePatientService --> TransactionManagerInterface
+DischargePatientService --> AdmissionDischargePolicy
+
+EloquentAdmissionRepository ..|> AdmissionRepositoryInterface
+EloquentBedRepository ..|> BedRepositoryInterface
+EloquentBedTransferRepository ..|> BedTransferRepositoryInterface
+LaravelTransactionManager ..|> TransactionManagerInterface
+
+EloquentAdmissionRepository --> PostgreSQL
+EloquentBedRepository --> PostgreSQL
+EloquentBedTransferRepository --> PostgreSQL
+LaravelTransactionManager --> PostgreSQL
+
+note right of "Contracts (interfaces)"
+Bajo acoplamiento: Application solo
+conoce estas interfaces. Las
+implementaciones Eloquent son
+sustituibles por dobles de prueba
+sin tocar TransferPatientService
+ni DischargePatientService.
+end note
+
+@enduml

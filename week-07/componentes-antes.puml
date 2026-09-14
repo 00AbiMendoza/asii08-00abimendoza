@@ -1,0 +1,49 @@
+@startuml
+title ASII-08 - Componentes ANTES (Alternativa B: Services con Eloquent directo)
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+package "Presentation" {
+    component TransferController
+    component DischargeController
+}
+
+package "Application" {
+    component TransferPatientService
+    component DischargePatientService
+}
+
+package "Infrastructure (Eloquent)" {
+    component "Admission (Eloquent Model)" as AdmissionModel
+    component "Bed (Eloquent Model)" as BedModel
+    component "BedTransfer (Eloquent Model)" as BedTransferModel
+    component "DB::transaction()" as DBFacade
+}
+
+database PostgreSQL
+
+TransferController --> TransferPatientService
+DischargeController --> DischargePatientService
+
+TransferPatientService ..> AdmissionModel : consulta/actualiza\ndirectamente
+TransferPatientService ..> BedModel : consulta/actualiza\ndirectamente
+TransferPatientService ..> BedTransferModel : crea\ndirectamente
+TransferPatientService ..> DBFacade : depende del\nfacade concreto
+
+DischargePatientService ..> AdmissionModel : consulta/actualiza\ndirectamente
+DischargePatientService ..> BedModel : consulta/actualiza\ndirectamente
+DischargePatientService ..> DBFacade
+
+AdmissionModel --> PostgreSQL
+BedModel --> PostgreSQL
+BedTransferModel --> PostgreSQL
+
+note bottom
+Alto acoplamiento: Application conoce Eloquent y SQL directamente.
+No hay contrato intermedio - imposible sustituir la persistencia
+o usar dobles de prueba sin arrancar Eloquent real.
+end note
+
+@enduml

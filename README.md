@@ -18,6 +18,7 @@ Este repositorio es un **espejo personal, semana a semana**, de mi propio avance
 | [week-02](week-02/) | Principio SOLID — Liskov Substitution Principle (LSP) | Diseño antes/después + informe final |
 | [week-03](week-03/) | Diseño arquitectónico del Micro-HIS | Vista arquitectónica C4/UML del módulo |
 | [week-04](week-04/) | Arquitectura por capas y patrón Repository | Implementación completa (PHP 8.2+ vanilla) |
+| [week-07](week-07/) | Diseño de componentes y refactorización | Diagrama de componentes antes/después + contratos + refactor justificado |
 
 Cada carpeta de semana incluye su propio README con el detalle de la tarea y el entregable.
 
