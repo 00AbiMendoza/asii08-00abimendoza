@@ -1,0 +1,89 @@
+@startuml
+title ASII-08 — Diseño ANTES de aplicar LSP
+
+skinparam classAttributeIconSize 0
+hide empty fields
+
+class CoordinadorFlujo {
+    +procesar(salida: SalidaPaciente)
+}
+
+abstract class SalidaPaciente {
+    +ejecutar(admision): Resultado
+    #cerrarAdmision()
+    #liberarCamaOrigen()
+    #marcarCamaDisponible()
+}
+
+class AltaPaciente {
+    +ejecutar(admision): Resultado
+    +registrarDatosEgreso()
+}
+
+class TrasladoPaciente <<viola LSP>> {
+    +ejecutar(admision): Resultado
+    +validarCamaDestino()
+    +ocuparCamaDestino()
+    +mantenerAdmisionActiva()
+}
+
+CoordinadorFlujo --> SalidaPaciente : utiliza
+SalidaPaciente <|-- AltaPaciente
+SalidaPaciente <|-- TrasladoPaciente
+
+note right of SalidaPaciente
+  Contrato base problemático
+
+  Poscondiciones asumidas:
+  - la admisión queda cerrada
+  - se libera la cama origen
+  - la cama origen pasa
+    directamente a disponible
+
+  Estas reglas no son comunes
+  a traslado y alta.
+end note
+
+note right of AltaPaciente
+  El alta puede cerrar
+  la admisión.
+
+  Sin embargo, la cama origen
+  tampoco debería pasar
+  directamente a disponible:
+  primero debe quedar
+  en limpieza.
+end note
+
+note right of TrasladoPaciente
+  PROBLEMA DE SUSTITUIBILIDAD
+
+  Un traslado:
+  - NO cierra la admisión
+  - requiere cama destino
+  - mantiene admisión activa
+  - destino -> ocupada
+  - origen -> limpieza
+
+  Por lo tanto, contradice
+  las poscondiciones heredadas
+  de SalidaPaciente.
+end note
+
+note bottom of CoordinadorFlujo
+  El consumidor termina necesitando
+  lógica específica por subtipo:
+
+  if (salida es TrasladoPaciente) {
+      no cerrar admisión
+      validar y ocupar destino
+  } else {
+      cerrar admisión
+  }
+
+  El consumidor conoce el subtipo
+  para corregir el contrato base.
+  Esto evidencia la violación de LSP.
+end note
+
+@enduml

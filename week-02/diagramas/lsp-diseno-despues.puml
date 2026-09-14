@@ -1,0 +1,93 @@
+@startuml
+title ASII-08 — Diseño DESPUÉS de aplicar LSP
+
+skinparam classAttributeIconSize 0
+hide empty fields
+
+class CoordinadorFlujo {
+    +procesar(operacion: OperacionDisposicionPaciente)
+}
+
+interface OperacionDisposicionPaciente {
+    +ejecutar(admision): Resultado
+}
+
+class OperacionTraslado {
+    +ejecutar(admision): Resultado
+    +validarCamaDestino()
+    +ocuparCamaDestino()
+    +mantenerAdmisionActiva()
+}
+
+class OperacionAlta {
+    +ejecutar(admision): Resultado
+    +registrarDatosEgreso()
+    +cerrarAdmision()
+}
+
+class AuditoriaService
+class TransaccionManager
+
+CoordinadorFlujo --> OperacionDisposicionPaciente : utiliza
+OperacionDisposicionPaciente <|.. OperacionTraslado
+OperacionDisposicionPaciente <|.. OperacionAlta
+
+CoordinadorFlujo --> AuditoriaService
+CoordinadorFlujo --> TransaccionManager
+
+note right of OperacionDisposicionPaciente
+  Contrato común correcto
+
+  Invariantes compartidas:
+  - admisión activa
+  - autorización y tenant válidos
+  - operación transaccional
+  - cama origen liberada
+  - cama origen -> limpieza
+  - auditoría del resultado
+  - rollback ante error
+end note
+
+note right of OperacionTraslado
+  Reglas específicas:
+  - requiere cama destino
+  - valida que sea distinta
+  - valida disponibilidad
+  - destino -> ocupada
+  - admisión sigue activa
+  - origen -> limpieza
+
+  Cumple el contrato común
+  sin contradecirlo.
+end note
+
+note right of OperacionAlta
+  Reglas específicas:
+  - no requiere cama destino
+  - registra egreso
+  - cierra admisión
+  - origen -> limpieza
+
+  También cumple el
+  contrato común.
+end note
+
+note bottom of CoordinadorFlujo
+  El consumidor ya no necesita
+  condicionales por subtipo.
+
+  Puede trabajar contra la
+  abstracción común:
+
+  procesar(operacion):
+      validar contexto común
+      iniciar transacción
+      operacion.ejecutar()
+      registrar auditoría
+      confirmar transacción
+
+  Esto evidencia sustitución
+  correcta y aplicación de LSP.
+end note
+
+@enduml

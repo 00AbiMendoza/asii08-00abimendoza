@@ -1,0 +1,72 @@
+@startuml
+title Micro-HIS ASII-08 - Arquitectura por capas
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+package "Presentation" {
+    class ConsoleApplication
+    class "micro-his.php" as EntryPoint
+}
+
+package "Application" {
+    class TransferPatient
+    class DischargePatient
+    interface TransactionManager
+}
+
+package "Domain" {
+    class Bed
+    class Admission
+    interface BedRepository
+    interface AdmissionRepository
+    class DomainException
+}
+
+package "Persistence" {
+    class PdoConnection
+    class PdoBedRepository
+    class PdoAdmissionRepository
+    class PdoTransactionManager
+    class "SQLite" as DB <<database>>
+}
+
+EntryPoint --> ConsoleApplication
+EntryPoint --> PdoConnection
+EntryPoint --> PdoBedRepository
+EntryPoint --> PdoAdmissionRepository
+EntryPoint --> PdoTransactionManager
+
+ConsoleApplication --> TransferPatient
+ConsoleApplication --> DischargePatient
+
+TransferPatient --> BedRepository
+TransferPatient --> AdmissionRepository
+TransferPatient --> TransactionManager
+
+DischargePatient --> BedRepository
+DischargePatient --> AdmissionRepository
+DischargePatient --> TransactionManager
+
+PdoBedRepository ..|> BedRepository
+PdoAdmissionRepository ..|> AdmissionRepository
+PdoTransactionManager ..|> TransactionManager
+
+PdoBedRepository --> DB
+PdoAdmissionRepository --> DB
+PdoTransactionManager --> DB
+
+BedRepository --> Bed
+AdmissionRepository --> Admission
+
+note bottom
+PHP 8.2+ vanilla
+Sin framework
+PDO con sentencias preparadas
+Configuracion externa mediante .env
+end note
+
+@enduml
+
+

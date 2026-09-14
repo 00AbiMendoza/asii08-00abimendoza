@@ -1,0 +1,77 @@
+@startuml
+title Diagrama de casos de uso — ASII-08
+left to right direction
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam nodesep 55
+skinparam ranksep 45
+skinparam ArrowFontSize 10
+
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+  ArrowColor Black
+}
+
+skinparam actor {
+  BorderColor Black
+  FontColor Black
+}
+
+actor Enfermera
+actor Médico as Medico
+actor "Personal de\nsanitización" as Sanitizacion
+actor "Administrador\nhospitalario" as Admin
+
+rectangle "Módulo ASII-08\nTraslados, altas y liberación de camas" {
+  usecase "Gestionar traslado\ninterno" as UC_Traslado
+  usecase "Registrar alta\nhospitalaria" as UC_Alta
+  usecase "Confirmar sanitización\nde cama" as UC_Sanitizar
+  usecase "Consultar operaciones\ny excepciones" as UC_Consultar
+
+  usecase "Validar operación,\nautorización y tenant" as UC_Validar
+  usecase "Registrar auditoría\ny notificar resultado" as UC_Resultado
+
+  UC_Traslado -[hidden]down-> UC_Alta
+  UC_Alta -[hidden]down-> UC_Sanitizar
+  UC_Sanitizar -[hidden]down-> UC_Consultar
+  UC_Validar -[hidden]down-> UC_Resultado
+  UC_Traslado -[hidden]right-> UC_Validar
+}
+
+actor "Servicio de autenticación\ny autorización" as Autenticacion
+actor "Sistema de\nauditoría" as Auditoria
+actor "Sistema de\nnotificaciones" as Notificaciones
+
+Enfermera --> UC_Traslado
+Medico --> UC_Alta
+Sanitizacion --> UC_Sanitizar
+Admin --> UC_Consultar
+
+UC_Traslado ..> UC_Validar : <<include>>
+UC_Alta ..> UC_Validar : <<include>>
+UC_Sanitizar ..> UC_Validar : <<include>>
+UC_Consultar ..> UC_Validar : <<include>>
+
+UC_Traslado ..> UC_Resultado : <<include>>
+UC_Alta ..> UC_Resultado : <<include>>
+UC_Sanitizar ..> UC_Resultado : <<include>>
+
+UC_Validar --> Autenticacion
+UC_Resultado --> Auditoria
+UC_Resultado --> Notificaciones
+
+note right of UC_Resultado
+Traslado: destino ocupada y origen en limpieza.
+Alta: admisión cerrada y cama en limpieza.
+Sanitización: cama disponible tras confirmación.
+end note
+
+legend bottom
+Datos ficticios: PAC-DEM-001, ADM-DEM-001,
+CAM-A-101, CAM-B-204 y HOSP-DEMO-01.
+endlegend
+@enduml

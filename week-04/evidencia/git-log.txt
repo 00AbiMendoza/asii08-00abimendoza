@@ -1,0 +1,10 @@
+* 3dbec74 (HEAD -> feature/micro-his-asii-08) docs: agregar informe final de microservicios y monolito
+* 68cd66c (origin/feature/micro-his-asii-08) test: agregar evidencias de ejecucion y validacion
+* 44cc753 docs: agregar declaracion de IA y guia de defensa
+* 8a74682 docs: agregar diagrama editable del flujo de traslado y alta
+* 3b0ffe6 docs: agregar diagrama editable de arquitectura
+* 7bc877b feat: agregar ejecucion por consola y pruebas automatizadas
+* 3b68f68 feat(persistence): implementar PDO SQLite y esquema inicial
+* fe5550b feat(application): implementar traslado y alta transaccional
+* b9beb5e feat(domain): agregar entidades y contratos del modulo
+* 3485763 (origin/main, main) chore: inicializar estructura del micro HIS

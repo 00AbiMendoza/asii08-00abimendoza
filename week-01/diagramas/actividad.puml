@@ -1,0 +1,115 @@
+@startuml
+title Diagrama de actividad - ASII-08\nTraslado o alta con liberación consistente de cama
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam activity {
+  BackgroundColor White
+  BorderColor Black
+  DiamondBackgroundColor White
+  DiamondBorderColor Black
+  ArrowColor Black
+}
+
+start
+
+:Recibir solicitud de traslado o alta;
+:Autenticar al usuario;
+
+if (¿Autenticación válida?) then (Sí)
+else (No)
+  :Registrar intento rechazado;
+  :Notificar acceso no autorizado;
+  stop
+endif
+
+:Validar permisos, hospital y tenant;
+
+if (¿Usuario autorizado para la operación?) then (Sí)
+else (No)
+  :Registrar rechazo por permisos;
+  :Notificar operación denegada;
+  stop
+endif
+
+:Consultar la admisión ADM-DEM-001;
+
+if (¿Admisión activa y perteneciente al tenant?) then (Sí)
+else (No)
+  :Registrar rechazo por admisión inválida;
+  :Notificar que la admisión no puede procesarse;
+  stop
+endif
+
+if (¿Tipo de operación?) then (Traslado)
+  :Seleccionar cama destino CAM-B-204;
+
+  if (¿Destino distinto, disponible\ny del mismo tenant?) then (Sí)
+    :Revalidar disponibilidad de la cama destino;
+
+    if (¿La cama continúa disponible?) then (Sí)
+      :Iniciar transacción;
+      :Relacionar admisión con CAM-B-204;
+      :Marcar CAM-B-204 como ocupada;
+      :Marcar CAM-A-101 como limpieza;
+    else (No)
+      :Registrar conflicto de concurrencia;
+      :Notificar que la cama ya no está disponible;
+      stop
+    endif
+
+  else (No)
+    :Registrar rechazo por cama destino inválida;
+    :Notificar que no puede realizarse el traslado;
+    stop
+  endif
+
+else (Alta)
+  :Validar datos obligatorios del alta;
+
+  if (¿Datos del alta completos?) then (Sí)
+    :Iniciar transacción;
+    :Cerrar la admisión ADM-DEM-001;
+    :Marcar CAM-A-101 como limpieza;
+  else (No)
+    :Registrar rechazo por datos incompletos;
+    :Notificar que el alta no puede registrarse;
+    stop
+  endif
+endif
+
+:Crear registro de auditoría;
+
+if (¿Actualizaciones y auditoría correctas?) then (Sí)
+  :Confirmar transacción;
+  :Notificar operación exitosa;
+else (No)
+  :Revertir transacción;
+  :Registrar error técnico;
+  :Notificar que la operación fue revertida;
+  stop
+endif
+
+:La cama liberada permanece en limpieza;
+:Personal autorizado confirma sanitización;
+
+if (¿Confirmación válida?) then (Sí)
+  :Cambiar estado de limpieza a disponible;
+  :Registrar auditoría de sanitización;
+  :Notificar cama disponible;
+else (No)
+  :Mantener la cama en limpieza;
+  :Registrar rechazo de sanitización;
+endif
+
+stop
+
+legend bottom
+Datos ficticios:
+Paciente PAC-DEM-001
+Admisión ADM-DEM-001
+Hospital HOSP-DEMO-01
+Camas CAM-A-101 y CAM-B-204
+endlegend
+
+@enduml

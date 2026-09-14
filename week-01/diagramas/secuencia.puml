@@ -1,0 +1,166 @@
+@startuml
+title Diagrama de secuencia - ASII-08\nTraslado o alta con liberación consistente de cama
+
+hide footbox
+autonumber
+scale 1200 width
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam maxMessageSize 45
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  LifeLineBackgroundColor White
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+actor "Usuario autorizado\n(Enfermera o Médico)" as Usuario
+boundary "Interfaz" as UI
+control "Servicio\nASII-08" as Modulo
+participant "Autenticación y\nautorización" as Auth
+database "Base de datos\nhospitalaria" as BD
+participant "Auditoría" as Auditoria
+participant "Notificaciones" as Notificaciones
+actor "Personal de\nsanitización" as Sanitizacion
+
+note over Usuario,Modulo
+Datos ficticios:
+PAC-DEM-001, ADM-DEM-001,
+HOSP-DEMO-01, CAM-A-101 y CAM-B-204
+end note
+
+Usuario -> UI: Solicitar traslado o alta
+UI -> Modulo: procesarOperación(datos, token)
+Modulo -> Auth: validarAcceso(token, operación, tenant)
+Auth --> Modulo: resultado
+
+alt Acceso inválido
+  Modulo -> Auditoria: registrarRechazo()
+  Modulo -> Notificaciones: notificarDenegación()
+  Modulo --> UI: Error 401/403
+  UI --> Usuario: Mostrar operación denegada
+
+else Acceso válido
+  Modulo -> BD: consultarAdmisiónActiva(ADM-DEM-001)
+  BD --> Modulo: admisión y cama actual
+
+  alt Admisión inválida o de otro tenant
+    Modulo -> Auditoria: registrarRechazo()
+    Modulo --> UI: Error de validación
+    UI --> Usuario: Mostrar admisión no procesable
+
+  else Admisión válida
+
+    alt Operación de traslado
+      Modulo -> BD: validarDestino(CAM-B-204)
+
+      alt Destino inválido o no disponible
+        BD --> Modulo: validación rechazada
+        Modulo -> Auditoria: registrarRechazo()
+        Modulo --> UI: Traslado rechazado
+        UI --> Usuario: Mostrar cama no disponible
+
+      else Destino disponible
+        Modulo -> BD: iniciarTransacción()
+        Modulo -> BD: revalidar y ejecutar traslado
+        note right of BD
+        CAM-B-204: ocupada
+        CAM-A-101: limpieza
+        Admisión: nueva cama
+        end note
+        Modulo -> Auditoria: registrarTraslado()
+
+        alt Error técnico o de concurrencia
+          Modulo -> BD: revertirTransacción()
+          Modulo -> Auditoria: registrarError()
+          Modulo -> Notificaciones: notificarReversión()
+          Modulo --> UI: Error de operación
+
+        else Operación correcta
+          Modulo -> BD: confirmarTransacción()
+          Modulo -> Notificaciones: notificarTraslado()
+          alt Notificación enviada
+            Notificaciones --> Modulo: envío confirmado
+          else Fallo de notificación
+            Notificaciones --> Modulo: error de envío
+            Modulo -> Auditoria: registrarFalloNotificación()
+            Modulo -> Notificaciones: programarReintento()
+          end
+          Modulo --> UI: Traslado registrado
+        end
+        UI --> Usuario: Mostrar resultado
+      end
+
+    else Operación de alta
+      Modulo -> Modulo: validarDatosDelAlta()
+
+      alt Datos incompletos
+        Modulo -> Auditoria: registrarRechazo()
+        Modulo --> UI: Error de validación
+        UI --> Usuario: Mostrar datos requeridos
+
+      else Datos completos
+        Modulo -> BD: iniciarTransacción()
+        Modulo -> BD: cerrarAdmisiónYMarcarLimpieza()
+        note right of BD
+        ADM-DEM-001: cerrada
+        CAM-A-101: limpieza
+        end note
+        Modulo -> Auditoria: registrarAlta()
+
+        alt Error técnico
+          Modulo -> BD: revertirTransacción()
+          Modulo -> Auditoria: registrarError()
+          Modulo -> Notificaciones: notificarReversión()
+          Modulo --> UI: Error de operación
+
+        else Operación correcta
+          Modulo -> BD: confirmarTransacción()
+          Modulo -> Notificaciones: notificarAlta()
+          alt Notificación enviada
+            Notificaciones --> Modulo: envío confirmado
+          else Fallo de notificación
+            Notificaciones --> Modulo: error de envío
+            Modulo -> Auditoria: registrarFalloNotificación()
+            Modulo -> Notificaciones: programarReintento()
+          end
+          Modulo --> UI: Alta registrada
+        end
+        UI --> Usuario: Mostrar resultado
+      end
+    end
+  end
+end
+
+== Confirmación posterior de sanitización ==
+
+Sanitizacion -> UI: Confirmar sanitización
+UI -> Modulo: confirmarSanitización(CAM-A-101, token)
+Modulo -> Auth: validarPermisoSanitización()
+Auth --> Modulo: resultado
+Modulo -> BD: consultarEstadoYTenant(CAM-A-101)
+
+alt Confirmación inválida
+  Modulo -> Auditoria: registrarRechazo()
+  Modulo --> UI: Mantener cama en limpieza
+  UI --> Sanitizacion: Mostrar rechazo
+
+else Confirmación válida
+  Modulo -> BD: cambiarLimpiezaADisponible()
+  Modulo -> Auditoria: registrarSanitización()
+  Modulo -> Notificaciones: notificarCamaDisponible()
+  alt Notificación enviada
+    Notificaciones --> Modulo: envío confirmado
+  else Fallo de notificación
+    Notificaciones --> Modulo: error de envío
+    Modulo -> Auditoria: registrarFalloNotificación()
+    Modulo -> Notificaciones: programarReintento()
+  end
+  Modulo --> UI: Sanitización confirmada
+  UI --> Sanitizacion: Mostrar cama disponible
+end
+
+@enduml

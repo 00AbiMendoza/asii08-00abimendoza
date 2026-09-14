@@ -1,0 +1,50 @@
+@startuml
+title Micro-HIS ASII-08 - Flujo de traslado y alta
+
+start
+
+:Recibir identificador de admision;
+
+if (Operacion?) then (Traslado)
+    :Recibir cama destino;
+    :Buscar admision activa;
+    :Buscar cama origen;
+    :Buscar cama destino;
+
+    if (Cama destino disponible?) then (Si)
+        :Iniciar transaccion;
+        :Cama origen -> cleaning;
+        :Cama destino -> occupied;
+        :Actualizar admision con nueva cama;
+        :Guardar cambios;
+
+        if (Persistencia correcta?) then (Si)
+            :Commit;
+            :Traslado realizado;
+        else (No)
+            :Rollback;
+            :Reportar error de persistencia;
+        endif
+    else (No)
+        :Rechazar traslado por regla de dominio;
+    endif
+
+else (Alta)
+    :Buscar admision activa;
+    :Buscar cama ocupada;
+    :Iniciar transaccion;
+    :Cama origen -> cleaning;
+    :Admision -> closed;
+    :Guardar cambios;
+
+    if (Persistencia correcta?) then (Si)
+        :Commit;
+        :Alta realizada;
+    else (No)
+        :Rollback;
+        :Reportar error de persistencia;
+    endif
+endif
+
+stop
+@enduml

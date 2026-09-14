@@ -1,0 +1,9 @@
+~$*.docx
+.env
+/week-04/database/*.sqlite
+/week-04/database/*.db
+/vendor/
+/coverage/
+*.log
+.DS_Store
+Thumbs.db

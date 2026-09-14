@@ -1,0 +1,11 @@
+* d90b404 (HEAD -> feature/diagramas-uml-asii-08, origin/feature/diagramas-uml-asii-08) docs(documento): agregar informe final UML en Word y PDF
+* 3324526 docs(documento): agregar portada y contenido del informe UML
+* 12ee072 docs(defensa): agregar gu├¡a para exposici├│n oral
+* 5d666ed docs(evidencia): agregar historial estructura y referencia de Git
+* 8c0d403 docs: agregar declaraci├│n de uso de inteligencia artificial
+* b1cb94e docs(trazabilidad): agregar matriz y completar manejo de notificaciones
+* a38831f docs(uml): agregar diagrama de secuencia ASII-08
+* cc3b9c5 docs(uml): agregar diagrama de actividad ASII-08
+* 8c3c0e2 docs(uml): agregar diagrama de casos de uso ASII-08
+* 77baa1d docs(trazabilidad): definir proceso requisitos y excepciones ASII-08
+* 0c98f2e (origin/main, origin/HEAD, main) Initial commit
