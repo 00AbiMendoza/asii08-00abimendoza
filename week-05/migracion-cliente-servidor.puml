@@ -1,0 +1,65 @@
+@startuml
+title ASII-08 - Migracion razonada: Micro-HIS -> cliente-servidor
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+package "ANTES (semanas 3-4)\nMicro-HIS - monolito local" as Antes {
+    component ConsoleApplication
+    component TransferPatient as TP1
+    component DischargePatient as DP1
+    interface AdmissionRepository as AR1
+    interface BedRepository as BR1
+    component PdoAdmissionRepository
+    component PdoBedRepository
+    database "SQLite\n(un solo proceso)" as SQLite
+}
+
+package "DESPUES (implementado)\nCliente-servidor REST" as Despues {
+    component "Clientes HTTP\n(Vue, Postman, otros servicios)" as Cliente
+    component TransferController
+    component DischargeController
+    component TransferPatientService as TP2
+    component DischargePatientService as DP2
+    interface AdmissionRepositoryInterface as AR2
+    interface BedRepositoryInterface as BR2
+    component EloquentAdmissionRepository
+    component EloquentBedRepository
+    database "PostgreSQL\n(multi-tenant, red)" as PG
+}
+
+ConsoleApplication --> TP1
+ConsoleApplication --> DP1
+TP1 --> AR1
+TP1 --> BR1
+DP1 --> AR1
+PdoAdmissionRepository ..|> AR1
+PdoBedRepository ..|> BR1
+PdoAdmissionRepository --> SQLite
+PdoBedRepository --> SQLite
+
+Cliente --> TransferController : HTTP POST\n+ JWT
+Cliente --> DischargeController : HTTP POST\n+ JWT
+TransferController --> TP2
+DischargeController --> DP2
+TP2 --> AR2
+TP2 --> BR2
+DP2 --> AR2
+EloquentAdmissionRepository ..|> AR2
+EloquentBedRepository ..|> BR2
+EloquentAdmissionRepository --> PG
+EloquentBedRepository --> PG
+
+Antes -[hidden]right-> Despues
+
+note bottom of Despues
+Lo que NO cambio en la migracion: las reglas de dominio
+(admision activa, cama origen->limpieza, destino->ocupada,
+atomicidad) y los nombres/forma de los casos de uso.
+Lo que SI cambio: el canal de entrada (consola -> HTTP+JWT),
+el motor de persistencia (SQLite proceso unico -> PostgreSQL
+multi-tenant en red) y las interfaces Repository concretas.
+end note
+
+@enduml

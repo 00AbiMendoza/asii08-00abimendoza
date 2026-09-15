@@ -1,0 +1,47 @@
+@startuml
+title ASII-08 - Frontera de microservicio evaluada
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+package "ASII-08 (esta frontera)\nTraslados, altas y liberacion de camas" as ASII08 {
+    component "API REST\n(transfer / discharge)" as API08
+    database "admissions\nbeds\nbed_transfers" as DB08
+    API08 --> DB08 : lectura/escritura\n(dueno exclusivo)
+}
+
+package "Catalogo de camas y wards\n(otro modulo)" as Catalogo {
+    component "API Catalogo"
+}
+
+package "Admision hospitalaria\n(otro modulo)" as Admision {
+    component "API Admision"
+}
+
+package "Roles y permisos\n(ASII-02)" as Roles {
+    component "API Roles"
+}
+
+package "Auditoria y notificaciones\n(otros modulos)" as AuditNotif {
+    component "API Auditoria/Notif."
+}
+
+package "CENTRAL\n(multi-hospital)" as Central {
+    component "Referencias logicas"
+}
+
+Catalogo -[#gray]-> ASII08 : REST sincrono\n(consulta estado de cama)
+Admision -[#gray]-> ASII08 : REST sincrono\n(admision activa + cama actual)
+Roles -[#gray]-> ASII08 : JWT + claims\n(autorizacion)
+ASII08 -[#gray]-> AuditNotif : evento asincrono\n(fuera de alcance actual)
+ASII08 ..> Central : UUID logico\n(sin FK remota)
+
+note bottom of ASII08
+Propiedad de datos: ASII-08 es el UNICO dueno de escritura de
+admissions.bed_id, beds.status y bed_transfers. Los demas modulos
+solo leen via su propia API o via el contrato REST de ASII-08 --
+nunca escriben directamente en estas tablas.
+end note
+
+@enduml
