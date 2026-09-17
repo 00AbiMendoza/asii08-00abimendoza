@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASII-08 · Prototipo navegable</title>
+<style>
+  :root {
+    --navy: #1E2761;
+    --navy-dark: #141A45;
+    --teal: #02C39A;
+    --coral: #E4572E;
+    --bg: #F7F9FC;
+    --text: #1F2937;
+    --muted: #6B7280;
+    --border: #E2E8F5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+  }
+  .device {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    background: #fff;
+    box-shadow: 0 0 24px rgba(0,0,0,0.06);
+  }
+  header {
+    background: var(--navy);
+    color: #fff;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  header button.back {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    visibility: hidden;
+  }
+  header button.back.show { visibility: visible; }
+  header h1 { font-size: 17px; margin: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .role { margin-left: auto; font-size: 12px; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px; white-space: nowrap; flex-shrink: 0; }
+  header h1 { min-width: 0; flex: 1; }
+
+  main { padding: 18px 20px 100px; }
+  .screen { display: none; }
+  .screen.active { display: block; animation: fade .15s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
+
+  .search { display:flex; gap:8px; margin-bottom: 16px; }
+  .search input { flex:1; padding: 10px 12px; border:1px solid var(--border); border-radius: 8px; font-size:14px; }
+  .search button { padding: 10px 14px; border:none; background: var(--navy); color:#fff; border-radius:8px; font-size:14px; }
+
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background: #fff;
+    transition: box-shadow .15s;
+  }
+  .card:hover { box-shadow: 0 2px 10px rgba(30,39,97,0.12); }
+  .card .info b { display:block; font-size:14px; }
+  .card .info span { font-size: 12px; color: var(--muted); }
+  .card .chevron { color: var(--navy); font-size: 18px; }
+
+  .hint { font-size: 12px; color: var(--muted); margin-top: 14px; line-height: 1.5; }
+
+  .detail-box { background: var(--bg); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; }
+  .detail-box b { display:block; font-size: 15px; margin-bottom: 4px; }
+  .detail-box span { font-size: 13px; color: var(--muted); display:block; }
+
+  .action-btn {
+    display:block; width:100%; padding: 14px; margin-bottom: 12px;
+    border-radius: 10px; border: 1.5px solid var(--navy); background: #fff;
+    color: var(--navy); font-size: 15px; font-weight: 600; cursor:pointer;
+  }
+  .action-btn.primary { background: var(--navy); color:#fff; }
+  .action-btn.ghost { border-color: var(--border); color: var(--text); font-weight: 500; }
+
+  label { display:block; font-size: 13px; font-weight: 600; margin: 16px 0 6px; }
+  select, textarea, input[type=text] {
+    width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit;
+  }
+  .field-error { color: var(--coral); font-size: 12.5px; margin-top: 6px; }
+
+  .sticky-actions {
+    position: sticky; bottom: 0; background: #fff; padding: 14px 0 4px;
+    display:flex; gap: 10px; border-top: 1px solid var(--border); margin-top: 22px;
+  }
+  .sticky-actions button { flex:1; padding: 13px 8px; border-radius: 10px; font-size: 13.5px; font-weight:600; cursor:pointer; white-space: nowrap; }
+  .btn-cancel { background:#fff; border:1.5px solid var(--border); color: var(--text); }
+  .btn-confirm { background: var(--navy); border:none; color:#fff; }
+  .btn-confirm-error { background: var(--coral); border:none; color:#fff; }
+
+  .result { text-align:center; padding: 30px 10px 10px; }
+  .result .icon { font-size: 46px; margin-bottom: 10px; }
+  .result.success .icon { color: var(--teal); }
+  .result.error .icon { color: var(--coral); }
+  .result h2 { font-size: 19px; margin: 0 0 8px; }
+  .result p { color: var(--muted); font-size: 14px; margin: 4px 0; }
+  .result .status-line { font-family: monospace; font-size: 13px; background: var(--bg); padding: 10px; border-radius: 8px; margin: 16px 0; text-align:left; }
+
+  .banner-error {
+    background: #FDF1EE; border: 1px solid var(--coral); color: #7A2E1A;
+    border-radius: 8px; padding: 12px 14px; font-size: 13px; margin-bottom: 16px; line-height: 1.5;
+  }
+
+  .demo-note {
+    max-width: 480px; margin: 14px auto 0; font-size: 12px; color: var(--muted); text-align:center; padding: 0 20px;
+  }
+
+  @media (max-width: 400px) {
+    header { padding: 14px 16px; gap: 8px; }
+    header h1 { font-size: 15px; }
+    header .role { font-size: 11px; padding: 3px 8px; white-space: nowrap; }
+    .sticky-actions button { font-size: 12.5px; padding: 12px 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="device">
+  <header>
+    <button class="back" id="backBtn" onclick="goBack()">‹</button>
+    <h1 id="screenTitle">ASII-08</h1>
+    <span class="role">Enfermera</span>
+  </header>
+
+  <main>
+
+    <!-- S1: Inicio -->
+    <section class="screen active" id="s-inicio" data-title="ASII-08">
+      <div class="search">
+        <input type="text" placeholder="Buscar admisión..." disabled>
+        <button disabled>Buscar</button>
+      </div>
+      <div class="card" onclick="go('s-decision')">
+        <div class="info"><b>ADM-DEM-001</b><span>CAM-A-101 · Ocupada</span></div>
+        <div class="chevron">›</div>
+      </div>
+      <div class="card" onclick="go('s-decision')">
+        <div class="info"><b>ADM-DEM-004</b><span>CAM-B-204 · Ocupada</span></div>
+        <div class="chevron">›</div>
+      </div>
+      <div class="card" onclick="go('s-decision')">
+        <div class="info"><b>ADM-DEM-007</b><span>CAM-A-108 · Ocupada</span></div>
+        <div class="chevron">›</div>
+      </div>
+      <p class="hint">(i) Admisiones activas de su hospital. Toque una tarjeta para continuar.</p>
+    </section>
+
+    <!-- S2: Decision -->
+    <section class="screen" id="s-decision" data-title="ADM-DEM-001">
+      <div class="detail-box">
+        <b>CAM-A-101 (Ocupada)</b>
+        <span>Admisión activa desde 04/09/2026</span>
+      </div>
+      <button class="action-btn primary" onclick="go('s-form')">Trasladar paciente</button>
+      <button class="action-btn ghost" onclick="go('s-decision')">Dar de alta</button>
+      <p class="hint">(i) Solo ve acciones permitidas por su rol.</p>
+    </section>
+
+    <!-- S3: Formulario -->
+    <section class="screen" id="s-form" data-title="Trasladar paciente">
+      <div class="detail-box">
+        <b>Cama actual: CAM-A-101</b>
+        <span>Estado: Ocupada</span>
+      </div>
+      <label>Cama destino *</label>
+      <select id="camaDestino">
+        <option value="">Seleccionar cama disponible...</option>
+        <option value="ok">CAM-B-204 (disponible)</option>
+        <option value="fail">CAM-C-110 (a veces ocupada por otra operación)</option>
+      </select>
+      <label>Motivo (opcional)</label>
+      <textarea rows="2" placeholder="Ej. reubicación por especialidad..."></textarea>
+
+      <div class="sticky-actions">
+        <button class="btn-cancel" onclick="go('s-decision')">Cancelar</button>
+        <button class="btn-confirm" onclick="submitTransfer()">Confirmar traslado</button>
+      </div>
+      <p class="hint">Camino feliz: elija "CAM-B-204 (disponible)". Error crítico: elija "CAM-C-110" para ver el rechazo por cama no disponible (CA-02).</p>
+    </section>
+
+    <!-- S4a: Exito -->
+    <section class="screen" id="s-exito" data-title="ASII-08">
+      <div class="result success">
+        <div class="icon">✔</div>
+        <h2>Traslado registrado correctamente</h2>
+        <div class="status-line">
+          CAM-A-101 → limpieza<br>
+          CAM-B-204 → ocupada<br>
+          bed_transfers: 1 registro creado
+        </div>
+        <p>La operación se completó de forma atómica.</p>
+      </div>
+      <button class="action-btn primary" onclick="go('s-inicio')">Volver al inicio</button>
+    </section>
+
+    <!-- S4b: Error critico -->
+    <section class="screen" id="s-error" data-title="Trasladar paciente">
+      <div class="banner-error">
+        ⚠ <b>No se pudo completar el traslado.</b><br>
+        La cama CAM-C-110 ya no está disponible (fue ocupada por otra operación). Elija otra cama.
+      </div>
+      <label>Cama destino *</label>
+      <select disabled>
+        <option>CAM-C-110 (no disponible)</option>
+      </select>
+      <label>Motivo (opcional)</label>
+      <textarea rows="2" disabled>reubicación por especialidad</textarea>
+      <div class="sticky-actions">
+        <button class="btn-cancel" onclick="go('s-inicio')">Cancelar</button>
+        <button class="btn-confirm-error" onclick="go('s-form')">Elegir otra cama</button>
+      </div>
+      <p class="hint">(i) Sus datos no se perdieron. Puede reintentar sin riesgo de duplicar el traslado (CA-02 / RB-02).</p>
+    </section>
+
+  </main>
+</div>
+
+<p class="demo-note">Prototipo de demostración — módulo ASII-08. No procesa datos reales; simula las respuestas 200/422 del backend ya implementado.</p>
+
+<script>
+  let history = ['s-inicio'];
+
+  function go(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('screenTitle').textContent = document.getElementById(id).dataset.title;
+    document.getElementById('backBtn').classList.toggle('show', id !== 's-inicio');
+    if (history[history.length - 1] !== id) history.push(id);
+  }
+
+  function goBack() {
+    if (history.length > 1) {
+      history.pop();
+      const prev = history[history.length - 1];
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(prev).classList.add('active');
+      document.getElementById('screenTitle').textContent = document.getElementById(prev).dataset.title;
+      document.getElementById('backBtn').classList.toggle('show', prev !== 's-inicio');
+    }
+  }
+
+  function submitTransfer() {
+    const val = document.getElementById('camaDestino').value;
+    if (!val) {
+      alert('Debe seleccionar una cama destino para continuar.');
+      return;
+    }
+    if (val === 'ok') {
+      go('s-exito');
+    } else {
+      go('s-error');
+    }
+  }
+
+  // Solo para generar capturas de documentacion (?demo=decision|form|exito|error). No forma parte del flujo real.
+  const demoState = new URLSearchParams(location.search).get('demo');
+  if (demoState === 'decision') go('s-decision');
+  if (demoState === 'form') go('s-form');
+  if (demoState === 'exito') { go('s-decision'); go('s-form'); go('s-exito'); }
+  if (demoState === 'error') { go('s-decision'); go('s-form'); go('s-error'); }
+</script>
+
+</body>
+</html>

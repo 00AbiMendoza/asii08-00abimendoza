@@ -1,0 +1,39 @@
+@startuml
+title ASII-08 - Mapa de navegacion del prototipo
+
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #F7F9FC
+  BorderColor #1E2761
+  ArrowColor #1E2761
+}
+
+[*] --> Inicio
+
+state Inicio : Lista de admisiones activas
+state Decision : Elegir accion (Trasladar / Dar de alta)
+state Formulario : Seleccionar cama destino + motivo
+state Exito : "Traslado registrado correctamente"
+state ErrorCritico : "Cama destino no disponible" (CA-02)
+
+Inicio --> Decision : toca una admision
+Decision --> Formulario : "Trasladar paciente"
+Decision --> Inicio : "‹" volver
+
+Formulario --> Exito : cama disponible\n(camino feliz)
+Formulario --> ErrorCritico : cama ya no disponible\n(error critico)
+Formulario --> Decision : "Cancelar"
+
+Exito --> Inicio : "Volver al inicio"
+
+ErrorCritico --> Formulario : "Elegir otra cama"
+ErrorCritico --> Inicio : "Cancelar"
+
+note right of ErrorCritico
+Los datos del formulario
+se conservan; reintentar
+no duplica el traslado
+(operacion no repetible).
+end note
+
+@enduml
