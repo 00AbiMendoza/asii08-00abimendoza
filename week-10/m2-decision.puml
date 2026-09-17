@@ -1,0 +1,19 @@
+@startsalt
+{
+  {+
+    <b>‹  ADM-DEM-001
+    ==
+    Cama actual
+    <b>CAM-A-101 (Ocupada)
+    Admisión desde 04/09/2026
+    ..
+    ¿Qué desea hacer?
+    ..
+    [Trasladar paciente                ]
+    [Dar de alta                       ]
+    ..
+    (i) Solo ve acciones permitidas
+    por su rol.
+  }
+}
+@endsalt

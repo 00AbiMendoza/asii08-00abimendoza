@@ -1,0 +1,25 @@
+@startsalt
+{
+  {+
+    <b>‹  Trasladar paciente
+    ==
+    Cama actual
+    CAM-A-101 (Ocupada)
+    ..
+    Cama destino  *
+    ^Seleccionar cama...^
+    ..
+    Motivo (opcional)
+    "                                   "
+    ..
+    .
+    .
+    .
+    {
+      [Cancelar          ] | [Confirmar        ]
+    }
+    (i) Botones fijos al pie de pantalla,
+    dentro del alcance del pulgar.
+  }
+}
+@endsalt

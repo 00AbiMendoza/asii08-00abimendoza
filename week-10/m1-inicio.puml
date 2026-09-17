@@ -1,0 +1,29 @@
+@startsalt
+{
+  {+
+    <b>☰  ASII-08              [E]
+    ==
+    {"Buscar admisión..." | [ ]}
+    --
+    {SI
+      <b>ADM-DEM-001
+      CAM-A-101 · Ocupada
+      [Ver >]
+    }
+    --
+    {SI
+      <b>ADM-DEM-004
+      CAM-B-204 · Ocupada
+      [Ver >]
+    }
+    --
+    {SI
+      <b>ADM-DEM-007
+      CAM-A-108 · Ocupada
+      [Ver >]
+    }
+    ..
+    <size:10>(i) Admisiones activas de su hospital.</size>
+  }
+}
+@endsalt

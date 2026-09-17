@@ -1,0 +1,25 @@
+@startsalt
+{
+  {+
+    <b>‹  Trasladar paciente
+    ==
+    <color:#B00020>⚠ Sin conexión</color>
+    <color:#B00020>No se pudo enviar el traslado.</color>
+    <color:#B00020>Sus datos no se perdieron.</color>
+    ..
+    Cama destino  *
+    CAM-B-204 (guardado localmente)
+    ..
+    Motivo (opcional)
+    "reubicación por especialidad     "
+    ..
+    .
+    {
+      [Guardar y reintentar luego    ] | [Reintentar ahora ]
+    }
+    (i) Se reintenta automáticamente al
+    recuperar conexión. No se duplica
+    el traslado (operación no repetible).
+  }
+}
+@endsalt
