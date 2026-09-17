@@ -21,6 +21,7 @@ Este repositorio es un **espejo personal, semana a semana**, de mi propio avance
 | [week-05](week-05/) | Cliente-servidor, API REST, microservicios e integración | Migración razonada + frontera de microservicio + contrato API |
 | [week-07](week-07/) | Diseño de componentes y refactorización | Diagrama de componentes antes/después + contratos + refactor justificado |
 | [week-08](week-08/) | Diseño de experiencia de usuario | User flow por rol + 6 wireframes anotados |
+| [week-09](week-09/) | Evaluación de usabilidad y accesibilidad | Checklist WCAG + 7 hallazgos + backlog priorizado |
 
 Cada carpeta de semana incluye su propio README con el detalle de la tarea y el entregable.
 
