@@ -1,0 +1,20 @@
+@startsalt
+{
+  {+
+    <b>Admisión ADM-DEM-001                                       [Enfermera ▾]
+    ==
+    Cama actual: CAM-A-101 (Ocupada)
+    Admisión activa desde: 04/09/2026
+    ..
+    ¿Qué desea hacer con esta admisión?
+    ..
+    {
+      [Trasladar paciente] | [Dar de alta]
+    }
+    ..
+    (i) Las acciones visibles dependen de su rol. Si no ve una
+    acción esperada, contacte al administrador de su hospital.
+    [Cancelar]
+  }
+}
+@endsalt

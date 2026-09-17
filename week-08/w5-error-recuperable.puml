@@ -1,0 +1,24 @@
+@startsalt
+{
+  {+
+    <b>Trasladar paciente · Admisión ADM-DEM-001                   [Enfermera ▾]
+    ==
+    <color:#B00020>⚠ No se pudo completar el traslado</color>
+    <color:#B00020>La cama CAM-B-204 ya no está disponible</color>
+    <color:#B00020>(fue ocupada por otra operación). Elija otra cama.</color>
+    ..
+    Cama destino  *
+    ^CAM-B-204 (no disponible)^
+    ..
+    Motivo (opcional)
+    "reubicación por especialidad          "
+    ..
+    {
+      [Cancelar] | [Elegir otra cama] | [Reintentar]
+    }
+    ..
+    (i) Sus datos no se perdieron. Puede reintentar sin
+    riesgo de duplicar el traslado.
+  }
+}
+@endsalt

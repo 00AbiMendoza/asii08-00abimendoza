@@ -1,0 +1,30 @@
+@startsalt
+{
+  {
+    {+
+      <b>Estado: cargando
+      ==
+
+      [    ]
+      Procesando traslado...
+
+      (i) No cierre esta ventana.
+      La operación es atómica: se
+      completa o se revierte por
+      completo.
+
+    } |
+    {+
+      <b>Estado: éxito
+      ==
+      ✔ Traslado registrado
+      correctamente
+
+      Cama origen CAM-A-101 → limpieza
+      Cama destino CAM-B-204 → ocupada
+
+      [Ver admisión] | [Volver al inicio]
+    }
+  }
+}
+@endsalt

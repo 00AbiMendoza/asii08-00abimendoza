@@ -1,0 +1,48 @@
+@startuml
+title Flujo UX - Traslado o alta del paciente, por rol autorizado
+
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F7F9FC
+  BorderColor #1E2761
+  DiamondBackgroundColor #FFF3D6
+  DiamondBorderColor #8A6D00
+}
+
+start
+:Inicio: buscar admisión activa\n(Administrador, Médico, Enfermera, Recepcionista);
+
+if (¿Admisión encontrada y activa?) then (no)
+  :Estado vacío: "No se encontró\nuna admisión activa";
+  stop
+else (sí)
+endif
+
+:Decisión: elegir acción\n[Trasladar] o [Dar de alta];
+
+if (¿Rol tiene permiso para la acción elegida?) then (no)
+  :Error recuperable: "No tiene permiso\npara esta acción" + ayuda contextual;
+  stop
+else (sí)
+endif
+
+if (Acción = Trasladar) then (traslado)
+  :Formulario de traslado\n(estado vacío: sin cama destino seleccionada);
+  :Seleccionar cama destino\n(solo camas 'disponible' del mismo tenant);
+else (alta)
+  :Formulario de alta\n(tipo de alta + notas, con ayuda contextual\nsobre cada tipo);
+endif
+
+:Confirmación: revisar datos\n(paciente mostrado con protección de datos:\nsolo identificador, sin datos clínicos sensibles);
+:Estado de carga: enviando solicitud;
+
+if (¿Operación válida en el servidor?) then (no - ej. cama ya no disponible)
+  :Error recuperable: mensaje claro\n+ opción "Elegir otra cama" / "Reintentar"\n(datos del formulario se conservan);
+  stop
+else (sí)
+endif
+
+:Estado de éxito: confirmación\n"Traslado/Alta registrado correctamente";
+stop
+
+@enduml

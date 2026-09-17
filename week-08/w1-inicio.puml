@@ -1,0 +1,19 @@
+@startsalt
+{
+  {+
+    <b>ASII-08 · Traslados, altas y liberación de camas          [Enfermera ▾]
+    ==
+    Buscar admisión activa:  {"Cama o admisión..." | [Buscar]}
+    ..
+    {#
+      Admisión | Cama actual | Estado | Acción
+      ADM-DEM-001 | CAM-A-101 | Ocupada | [Ver]
+      ADM-DEM-004 | CAM-B-204 | Ocupada | [Ver]
+      ADM-DEM-007 | CAM-A-108 | Ocupada | [Ver]
+    }
+    ..
+    (i) Solo se muestran admisiones activas de su hospital (tenant).
+    Los identificadores son códigos ficticios de demostración.
+  }
+}
+@endsalt

@@ -1,0 +1,22 @@
+@startsalt
+{
+  {+
+    <b>Trasladar paciente · Admisión ADM-DEM-001                   [Enfermera ▾]
+    ==
+    Cama actual: CAM-A-101 (Ocupada)
+    ..
+    Cama destino  *
+    ^Seleccionar cama disponible...^
+    <color:#B00020>Debe seleccionar una cama destino para continuar.</color>
+    ..
+    Motivo (opcional)
+    "Ej. reubicación por especialidad...      "
+    ..
+    {
+      [Cancelar] | [Confirmar traslado]
+    }
+    ..
+    (i) Solo aparecen camas en estado "disponible" del mismo hospital.
+  }
+}
+@endsalt

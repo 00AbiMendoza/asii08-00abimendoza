@@ -1,0 +1,27 @@
+@startsalt
+{
+  {+
+    <b>Dar de alta · Admisión ADM-DEM-004                          [Médico ▾]
+    ==
+    Paciente: <b>[protegido] (ID: ADM-DEM-004)</b>
+    (i) Por protección de datos, solo se muestra el identificador
+    de la admisión. El nombre completo requiere permiso adicional.
+    ..
+    Tipo de alta  *                                    (?)
+    ^Seleccionar tipo...^
+    ..
+    (?) voluntaria: paciente decide retirarse · médica: alta
+    por criterio clínico · fallecimiento · traslado: continúa
+    en otro centro
+    ..
+    Notas (opcional)
+    "Observaciones del alta...            "
+    ..
+    {
+      [Cancelar] | [Confirmar alta]
+    }
+    ..
+    (i) Esta acción cierra la admisión y no puede repetirse.
+  }
+}
+@endsalt
