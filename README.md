@@ -19,6 +19,7 @@ Este repositorio es un **espejo personal, semana a semana**, de mi propio avance
 | [week-03](week-03/) | Diseño arquitectónico del Micro-HIS | Vista arquitectónica C4/UML del módulo |
 | [week-04](week-04/) | Arquitectura por capas y patrón Repository | Implementación completa (PHP 8.2+ vanilla) |
 | [week-05](week-05/) | Cliente-servidor, API REST, microservicios e integración | Migración razonada + frontera de microservicio + contrato API |
+| [week-06](week-06/) | Primera evaluación parcial | Presentación de 8 diapositivas + matriz decisión→evidencia + cambio práctico defendido |
 | [week-07](week-07/) | Diseño de componentes y refactorización | Diagrama de componentes antes/después + contratos + refactor justificado |
 | [week-08](week-08/) | Diseño de experiencia de usuario | User flow por rol + 6 wireframes anotados |
 | [week-09](week-09/) | Evaluación de usabilidad y accesibilidad | Checklist WCAG + 7 hallazgos + backlog priorizado |
